@@ -1,24 +1,109 @@
 ﻿@page "/"
+@using UglyToad.PdfPig
+@using Microsoft.AspNetCore.Components.Forms
+@using System.IO
+@using System.Text.RegularExpressions
 
 <!DOCTYPE html>
-    <html>
-    <head>
-        <PageTitle>SCHEDIO</PageTitle>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>SCHEDIO</title>
-        <link rel="stylesheet" href="~/css/app.css"
-    </head>
-    <body>
-        <div class="container">
-            <div class="content">
+<html>
+
+<head>
+    <PageTitle>SCHEDIO</PageTitle>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SCHEDIO</title>
+    <link rel="stylesheet" href="css/app.css" />
+</head>
+
+<body>
+    <div class="container">
+        <div class="content">
             <h1>SCHEDIO</h1>
-                <h5>Nunca volverás a olvidar una fecha importante</h5>
-                <div>
-                    <input type="file" id="file">
-                    <label for="file">INSERTA TU PROGRAMA DE CURSO</label>
-                </div>
+            <h5>Nunca volverás a olvidar una fecha importante</h5>
+            <div>
+                <label for="pdfFile">Selecciona un archivo PDF:</label>
+                <InputFile id="pdfFile" OnChange="HandleFileSelected" accept=".pdf" />
+
+                @if (sections != null)
+                {
+                    <h3>Secciones Extraídas:</h3>
+                    <ul>
+                        <li><strong>Horario de clases:</strong> @sections.Horario</li>
+                        <li><strong>Primera evaluación parcial:</strong> @sections.PrimeraEvaluacion</li>
+                        <li><strong>Segunda evaluación parcial:</strong> @sections.SegundaEvaluacion</li>
+                        <li><strong>Evaluación final:</strong> @sections.EvaluacionFinal</li>
+                    </ul>
+                }
+                else
+                {
+                    <p>No se han extraído secciones aún.</p>
+                }
             </div>
-           
         </div>
-    </body>
-    </html>
+    </div>
+
+    @code {
+        private dynamic? sections;
+
+        private async Task HandleFileSelected(InputFileChangeEventArgs e)
+        {
+            var file = e.File;
+            if (file != null && file.Size > 0)
+            {
+                using var stream = file.OpenReadStream(1 * 1024 * 1024);
+                using var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                memoryStream.Position = 0;
+
+                using (var document = PdfDocument.Open(memoryStream))
+                {
+                    string pdfText = "";
+                    foreach (var page in document.GetPages())
+                    {
+                        pdfText += page.Text + Environment.NewLine;
+                    }
+
+                    sections = new
+                    {
+                        Horario = ExtractSection(pdfText, "Horario de clases"),
+                        PrimeraEvaluacion = ExtractSection(pdfText, "Primera evaluación parcial"),
+                        SegundaEvaluacion = ExtractSection(pdfText, "Segunda evaluación parcial"),
+                        EvaluacionFinal = ExtractSection(pdfText, "Evaluación final")
+                    };
+                }
+            }
+        }
+
+        private string ExtractSection(string text, string sectionName)
+        {
+            string pattern;
+
+            switch (sectionName)
+            {
+                case "Horario de clases":
+                    // Captura solo días y horas
+                    pattern = @"Horario de clases\s*([\w\s,]+ \d{1,2}:\d{2} a \d{1,2}:\d{2},?)+";
+                    break;
+                case "Primera evaluación parcial":
+                    // Captura solo la fecha
+                    pattern = @"Primera evaluación parcial\s*(\d{1,2} de [\w\s]+(?: \d{4})?)";
+                    break;
+                case "Segunda evaluación parcial":
+                    // Captura solo la fecha
+                    pattern = @"Segunda evaluación parcial\s*(\d{1,2} de [\w\s]+(?: \d{4})?)";
+                    break;
+                case "Evaluación final":
+                    // Captura solo la fecha
+                    pattern = @"Evaluación final\s*(\d{1,2} de [\w\s]+(?: \d{4})?)";
+                    break;
+                default:
+                    return $"No se encontró la sección: {sectionName}";
+            }
+
+            var match = Regex.Match(text, pattern, RegexOptions.Singleline);
+            return match.Success ? match.Groups[1].Value.Trim() : $"No se encontró la sección: {sectionName}";
+        }
+
+    }
+</body>
+
+</html>
