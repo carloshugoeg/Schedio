@@ -1,6 +1,18 @@
 @page "/notification"
 @inject GoogleCalendarService CalendarService
 
+<!DOCTYPE html>
+<html>
+
+<head>
+    <PageTitle>SCHEDIO</PageTitle>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SCHEDIO</title>
+    <link rel="stylesheet" href="css/notification_style.css" />
+</head>
+
+<body>
+
 <h1>Crear Evento en Google Calendar</h1>
 <button @onclick="CrearEvento">Crear Evento</button>
 
@@ -17,3 +29,6 @@
         await CalendarService.CreateScheduledEvent(summary, description, startDateTime, endDateTime, timeZone, email);
     }
 }
+
+</body>
+</html>
