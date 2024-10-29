@@ -1,0 +1,19 @@
+@page "/notification"
+@inject GoogleCalendarService CalendarService
+
+<h1>Crear Evento en Google Calendar</h1>
+<button @onclick="CrearEvento">Crear Evento</button>
+
+@code {
+    private async Task CrearEvento()
+    {
+        string summary = "Reunión de prueba";
+        string description = "Descripción de la reunión";
+        DateTime startDateTime = new DateTime(2024, 11, 5, 10, 0, 0); 
+        DateTime endDateTime = startDateTime.AddHours(1); 
+        string timeZone = "America/Guatemala"; 
+        string email = "massielle.coti@gmail.com"; 
+
+        await CalendarService.CreateScheduledEvent(summary, description, startDateTime, endDateTime, timeZone, email);
+    }
+}
