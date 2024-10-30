@@ -40,13 +40,13 @@ a, .btn-link {
 }
 
 .content {
-    margin-top: 12%;
+    margin-top: 25%;
     color: #fff;
     max-width: 620px;
 }
 
 .form-control {
-    max-width: 820px;
+    max-width: 620px;
 }
 
 .content h1 {
@@ -67,10 +67,10 @@ input[type="file"] {
 
 label {
     padding: 10px 0;
-    height: 150px;
+    height: 200px;
     width: 80%;
     border-radius: 6px;
-    margin: 20px 0 20px 0;
+    margin: 40px 0 20px 0;
     border: 2px dashed #fff;
     text-align: center; 
     display: flex;

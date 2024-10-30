@@ -1,4 +1,8 @@
 Libreria de lectura de pdfs: dotnet add package UglyToad.PdfPig --prerelease
+
+Libreria para google calendar: dotnet add package Google.Apis.Calendar.v3
+
+
 Pasos para correr desde Visual Code:
 ![alt text](<WhatsApp Image 2024-10-29 at 01.00.48_0acb0199.jpg>)
 ![alt text](<WhatsApp Image 2024-10-29 at 01.00.48_0acb0199-1.jpg>)
