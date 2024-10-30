@@ -14,6 +14,7 @@
     <None Update=".\Credentials\credentials.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  
   </ItemGroup>
 
 </Project>

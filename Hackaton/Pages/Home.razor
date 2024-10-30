@@ -11,6 +11,19 @@
     <PageTitle>SCHEDIO</PageTitle>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SCHEDIO</title>
+    <style>
+        table, th, td{
+            border: 1px solid black;
+        }
+
+        th, td{
+            padding: 10px;
+        }
+
+        th {
+            text-align: center;
+        }
+    </style>
     <link rel="stylesheet" href="css/app.css" />
 </head>
 
@@ -33,12 +46,14 @@
                             <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                         </div>
                     </div>
+
                     <h3>Secciones Extraídas:</h3>
                     <ul>
                         <li><strong>Horario de clases:</strong> @sections.Horario</li>
                         <li><strong>Primera evaluación parcial:</strong> @sections.PrimeraEvaluacion</li>
                         <li><strong>Segunda evaluación parcial:</strong> @sections.SegundaEvaluacion</li>
                         <li><strong>Evaluación final:</strong> @sections.EvaluacionFinal</li>
+
                     </ul>
                     <div class="d-grid gap-2 col-9 mx-auto">
                         <button class="btn btn-primary" type="button">Generar Horario</button>
@@ -49,6 +64,7 @@
                     <div class="alert alert-warning" role="alert">
                         Porfavor cargar un Programa de curso para procesar  
                     </div>
+
                 }
             </div>
         </div>
@@ -56,12 +72,14 @@
 
     @code {
         private dynamic? sections;
+
         bool isLoading = true;
 
         private async Task HandleFileSelected(InputFileChangeEventArgs e)
         {
             isLoading = true;
             var file = e.File;
+
             if (file != null && file.Size > 0)
             {
                 using var stream = file.OpenReadStream(1 * 1024 * 1024);
@@ -77,11 +95,17 @@
                         pdfText += page.Text + Environment.NewLine;
                     }
 
+
+                    var extraccion = ExtractSection(pdfText, "Horario de clases");
+                    string[] partes = extraccion.Split(", ");
+
+
                     sections = new
                     {
                         Horario = ExtractSection(pdfText, "Horario de clases"),
                         PrimeraEvaluacion = ExtractSection(pdfText, "Primera evaluación parcial"),
                         SegundaEvaluacion = ExtractSection(pdfText, "Segunda evaluación parcial"),
+
                         EvaluacionFinal = ExtractSection(pdfText, "Evaluación final")
                         
                     };
@@ -89,6 +113,7 @@
                 isLoading = false;
             }
         }
+
 
         private string ExtractSection(string text, string sectionName)
         {
@@ -98,6 +123,7 @@
             {
                 case "Horario de clases":
                     // Captura solo días y horas
+\
                     pattern = @"Horario de clases\s*([\w\s,]+ \d{1,2}:\d{2} a \d{1,2}:\d{2},?)+";
                     break;
                 case "Primera evaluación parcial":
@@ -107,6 +133,7 @@
                 case "Segunda evaluación parcial":
                     // Captura solo la fecha
                     pattern = @"Segunda evaluación parcial\s*(\d{1,2} de [\w\s]+(?: \d{4})?)";
+
                     break;
                 case "Evaluación final":
                     // Captura solo la fecha
