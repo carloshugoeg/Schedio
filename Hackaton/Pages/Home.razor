@@ -11,6 +11,19 @@
     <PageTitle>SCHEDIO</PageTitle>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SCHEDIO</title>
+    <style>
+        table, th, td{
+            border: 1px solid black;
+        }
+
+        th, td{
+            padding: 10px;
+        }
+
+        th {
+            text-align: center;
+        }
+    </style>
     <link rel="stylesheet" href="css/app.css" />
 </head>
 
@@ -31,6 +44,48 @@
                         <li><strong>Primera evaluación parcial:</strong> @sections.PrimeraEvaluacion</li>
                         <li><strong>Segunda evaluación parcial:</strong> @sections.SegundaEvaluacion</li>
                         <li><strong>Evaluación final:</strong> @sections.EvaluacionFinal</li>
+                        <table>
+                            <tr>
+                                <th>-----</th>
+                                <th>Lunes</th>
+                                <th>Martes</th>
+                                <th>Miercoles</th>
+                                <th>Jueves</th>
+                                <th>Viernes</th>
+                            </tr>
+                            <tr>
+                                <th>08:30 a 09:50</th>
+                                <th>@sections.TablaHorario11</th>
+                                <th>@sections.TablaHorario12</th>
+                                <th>@sections.TablaHorario13</th>
+                                <th>@sections.TablaHorario14</th>
+                                <th>@sections.TablaHorario15</th>
+                            </tr>
+                            <tr>
+                                <th>10:20 a 11:40</th>
+                                <th>@sections.TablaHorario21</th>
+                                <th>@sections.TablaHorario22</th>
+                                <th>@sections.TablaHorario23</th>
+                                <th>@sections.TablaHorario24</th>
+                                <th>@sections.TablaHorario25</th>
+                            </tr>
+                            <tr>
+                                <th>11:50 a 13:10</th>
+                                <th>@sections.TablaHorario31</th>
+                                <th>@sections.TablaHorario32</th>
+                                <th>@sections.TablaHorario33</th>
+                                <th>@sections.TablaHorario34</th>
+                                <th>@sections.TablaHorario35</th>
+                            </tr>
+                            <tr>
+                                <th>15:05 a 16:25</th>
+                                <th>@sections.TablaHorario41</th>
+                                <th>@sections.TablaHorario42</th>
+                                <th>@sections.TablaHorario43</th>
+                                <th>@sections.TablaHorario44</th>
+                                <th>@sections.TablaHorario45</th>
+                            </tr>
+                        </table>
                     </ul>
                 }
                 else
@@ -47,6 +102,7 @@
         private async Task HandleFileSelected(InputFileChangeEventArgs e)
         {
             var file = e.File;
+            
             if (file != null && file.Size > 0)
             {
                 using var stream = file.OpenReadStream(1 * 1024 * 1024);
@@ -62,15 +118,96 @@
                         pdfText += page.Text + Environment.NewLine;
                     }
 
+                    var extraccion = ExtractSection(pdfText, "Horario de clases");
+                    string[] partes = extraccion.Split(", ");
+
                     sections = new
                     {
                         Horario = ExtractSection(pdfText, "Horario de clases"),
                         PrimeraEvaluacion = ExtractSection(pdfText, "Primera evaluación parcial"),
                         SegundaEvaluacion = ExtractSection(pdfText, "Segunda evaluación parcial"),
-                        EvaluacionFinal = ExtractSection(pdfText, "Evaluación final")
+                        EvaluacionFinal = ExtractSection(pdfText, "Evaluación final"),
+
+                        TablaHorario11 = createSchedule(partes, "1", "1"),
+                        TablaHorario12 = createSchedule(partes, "1", "2"),
+                        TablaHorario13 = createSchedule(partes, "1", "3"),
+                        TablaHorario14 = createSchedule(partes, "1", "4"),
+                        TablaHorario15 = createSchedule(partes, "1", "5"),
+
+                        TablaHorario21 = createSchedule(partes, "2", "1"),
+                        TablaHorario22 = createSchedule(partes, "2", "2"),
+                        TablaHorario23 = createSchedule(partes, "2", "3"),
+                        TablaHorario24 = createSchedule(partes, "2", "4"),
+                        TablaHorario25 = createSchedule(partes, "2", "5"),
+
+                        TablaHorario31 = createSchedule(partes, "3", "1"),
+                        TablaHorario32 = createSchedule(partes, "3", "2"),
+                        TablaHorario33 = createSchedule(partes, "3", "3"),
+                        TablaHorario34 = createSchedule(partes, "3", "4"),
+                        TablaHorario35 = createSchedule(partes, "3", "5"),
+
+                        TablaHorario41 = createSchedule(partes, "4", "1"),
+                        TablaHorario42 = createSchedule(partes, "4", "2"),
+                        TablaHorario43 = createSchedule(partes, "4", "3"),
+                        TablaHorario44 = createSchedule(partes, "4", "4"),
+                        TablaHorario45 = createSchedule(partes, "4", "5")
                     };
                 }
             }
+        }
+
+        private string createSchedule(string[] partes, string yRead, string xRead)
+        {
+            
+            var xCompare = "";
+            var yCompare = "";
+            foreach (string parte in partes)
+            {
+                Console.WriteLine(parte);
+                if (parte.Contains("Lunes"))
+                {
+                    xCompare = "1";
+                }
+                else if (parte.Contains("Martes"))
+                {
+                    xCompare = "2";
+                }
+                else if (parte.Contains("Miercones") || parte.Contains("Miércomes"))
+                {
+                    xCompare = "3";
+                }
+                else if (parte.Contains("Jueves"))
+                {
+                    xCompare = "4";
+                }
+                else
+                {
+                    xCompare = "5";
+                }
+
+                if (parte.Contains("08:30 a 09:50"))
+                {
+                    yCompare = "1";
+                }
+                else if (parte.Contains("10:20 a 11:40"))
+                {
+                    yCompare = "2";
+                }
+                else if (parte.Contains("11:50 a 13:10"))
+                {
+                    yCompare = "3";
+                }
+                else
+                {
+                    yCompare = "4";
+                }
+                
+                if (xCompare == xRead & yCompare == yRead )
+                {
+                    return "Nombre curso";
+                } 
+            }
+            return "";
         }
 
         private string ExtractSection(string text, string sectionName)
@@ -81,15 +218,15 @@
             {
                 case "Horario de clases":
                     // Captura solo días y horas
-                    pattern = @"Horario de clases\s*([\w\s,]+ \d{1,2}:\d{2} a \d{1,2}:\d{2},?)+";
+                    pattern =  @"((?:\s+\w+\s+\d{1,2}:\d{2} a \d{1,2}:\d{2},?)+)";
                     break;
                 case "Primera evaluación parcial":
                     // Captura solo la fecha
-                    pattern = @"Primera evaluación parcial\s*(\d{1,2} de [\w\s]+(?: \d{4})?)";
+                    pattern = @"Primera evaluación parcial\s*(\d{1,2} de \w+)";
                     break;
                 case "Segunda evaluación parcial":
                     // Captura solo la fecha
-                    pattern = @"Segunda evaluación parcial\s*(\d{1,2} de [\w\s]+(?: \d{4})?)";
+                    pattern = @"Segunda evaluación parcial\s*(\d{1,2} de \w+)";
                     break;
                 case "Evaluación final":
                     // Captura solo la fecha
