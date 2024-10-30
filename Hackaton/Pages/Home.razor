@@ -25,6 +25,14 @@
 
                 @if (sections != null)
                 {
+                    <div class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                Programa de curso procesado correctamente!!
+                            </div>
+                            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
                     <h3>Secciones Extraídas:</h3>
                     <ul>
                         <li><strong>Horario de clases:</strong> @sections.Horario</li>
@@ -32,10 +40,15 @@
                         <li><strong>Segunda evaluación parcial:</strong> @sections.SegundaEvaluacion</li>
                         <li><strong>Evaluación final:</strong> @sections.EvaluacionFinal</li>
                     </ul>
+                    <div class="d-grid gap-2 col-9 mx-auto">
+                        <button class="btn btn-primary" type="button">Generar Horario</button>
+                    </div>
                 }
                 else
                 {
-                    <p>No se han extraído secciones aún.</p>
+                    <div class="alert alert-warning" role="alert">
+                        Porfavor cargar un Programa de curso para procesar  
+                    </div>
                 }
             </div>
         </div>
@@ -43,9 +56,11 @@
 
     @code {
         private dynamic? sections;
+        bool isLoading = true;
 
         private async Task HandleFileSelected(InputFileChangeEventArgs e)
         {
+            isLoading = true;
             var file = e.File;
             if (file != null && file.Size > 0)
             {
@@ -68,8 +83,10 @@
                         PrimeraEvaluacion = ExtractSection(pdfText, "Primera evaluación parcial"),
                         SegundaEvaluacion = ExtractSection(pdfText, "Segunda evaluación parcial"),
                         EvaluacionFinal = ExtractSection(pdfText, "Evaluación final")
+                        
                     };
                 }
+                isLoading = false;
             }
         }
 
